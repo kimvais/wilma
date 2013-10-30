@@ -9,7 +9,18 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-def fetch(conf, user):
+def send_email(message, rcpt, sender, subject, timestamp, user):
+    msg = MIMEText(message)
+    msg['Subject'] = '[{}] {}'.format(user, subject)
+    msg['From'] = formataddr((sender, 'wilma-mailer@77.fi'))
+    msg['To'] = rcpt
+    msg['Date'] = formatdate(int(timestamp.strftime('%s')))
+    s = smtplib.SMTP(settings.SMTP)
+    s.send_message(msg)
+    s.quit()
+
+
+def fetch(conf, user, send_mail=True):
     session = requests.Session()
     req = session.get(conf.BASEURL)
     logger.info('{0} - {1}'.format(req.url, req.status_code))
@@ -37,7 +48,7 @@ def fetch(conf, user):
                                   '/messages/{0}'.format(message_id))
                 logger.info('{0} - {1}'.format(req.url, req.status_code))
                 soup = bs4.BeautifulSoup(req.text)
-                msg = soup.find('div', attrs={ 'class': 'columns-left-inner'})
+                msg = soup.find('div', attrs={'class': 'columns-left-inner'})
                 subject = soup.find('h1', attrs={'class': 'safeflow'}).text
                 try:
                     sender, recipient, timestamp = (x.text for x in
@@ -47,8 +58,11 @@ def fetch(conf, user):
                 else:
                     timestamp = parse(
                         timestamp.replace(' klo ', ' at '))
-                    message = '** {} - {} **\n\n{}'.format(user, timestamp.isoformat(),
-                        '\n\n'.join(x.text for x in msg.find_all('p')))
+                    message_body = '\n\n'.join(x.text for x in msg.find_all('p'))
+                    message = '** {} - {} **\n\n{}'.format(
+                        user,
+                        timestamp.isoformat(),
+                        message_body)
                     f.write(subject.encode('utf-8') + b'\n')
                     f.write(sender.encode('utf-8') + b'\n')
                     f.write(recipient.encode('utf-8') + b'\n')
@@ -56,14 +70,10 @@ def fetch(conf, user):
                     f.write(message.encode('utf-8') + b'\n')
 
                     # Mail
-                    msg = MIMEText(message)
-                    msg['Subject'] = '[{}] {}'.format(user, subject)
-                    msg['From'] = formataddr((sender, 'wilma-mailer@77.fi'))
-                    msg['To'] = conf.RECIPIENT
-                    msg['Date'] = formatdate(int(timestamp.strftime('%s')))
-                    s = smtplib.SMTP(settings.SMTP)
-                    s.send_message(msg)
-                    s.quit()
+                    if send_mail:
+                        rcpt = conf.RECIPIENT
+                        send_email(message, rcpt, sender, subject, timestamp,
+                                   user)
 
 
     # Log out
