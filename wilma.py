@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright © 2013 Kimmo Parviainen-Jalanko
+#
+# Licensed under MIT License, see LICENSE for details.
+#
+
 from email.mime.text import MIMEText
 from email.utils import formatdate, formataddr
 import logging
@@ -5,6 +13,7 @@ import smtplib
 import bs4
 from dateutil.parser import parse
 import requests
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +83,8 @@ def fetch(conf, user, send_mail=True):
                         rcpt = conf.RECIPIENT
                         send_email(message, rcpt, sender, subject, timestamp,
                                    user)
+                    else:
+                        logger.info("Not sending e-mail")
 
 
     # Log out
@@ -81,11 +92,10 @@ def fetch(conf, user, send_mail=True):
 
 
 if __name__ == "__main__":
+    import settings
     logging.basicConfig()
     logger.setLevel(logging.DEBUG)
-    import settings
-
-    logger.debug("Calling main")
     for user in settings.USERS.keys():
-        fetch(settings, user)
+        send_mail = len(sys.argv) < 2
+        fetch(settings, user, send_mail)
 
