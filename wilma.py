@@ -1,4 +1,6 @@
+from email.mime.text import MIMEText
 import logging
+import smtplib
 import bs4
 from dateutil.parser import parse
 import requests
@@ -47,9 +49,18 @@ def main(conf, user):
                     f.write(sender.encode('utf-8') + b'\n')
                     f.write(recipient.encode('utf-8') + b'\n')
                     timestamp = parse(
-                        timestamp.replace(' klo ', ' at ')).isoformat().encode('utf-8')
-                    f.write(timestamp + b'\n')
+                        timestamp.replace(' klo ', ' at ')).isoformat()
+                    f.write(timestamp.encode('utf-8') + b'\n')
                     f.write(message.encode('utf-8') + b'\n')
+
+                    # Mail
+                    msg = MIMEText(message)
+                    msg['Subject'] = subject
+                    msg['From'] = '{} <{}>'.format(sender, 'wilma-mailer@77.fi')
+                    msg['To'] = conf.RECIPIENT
+                    s = smtplib.SMTP(settings.SMTP)
+                    s.send_message(msg)
+                    s.quit()
 
 
     # Log out
