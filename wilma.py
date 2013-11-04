@@ -52,7 +52,7 @@ def fetch(conf, user, send_mail=True):
         message_id = message_link.attrs['href'].rsplit('/', 1)[-1]
 
         filename = os.path.join(settings.DATAPATH,
-                                'data/{0}_{1}.txt'.format(user, message_id))
+                                '{0}_{1}.txt'.format(user, message_id))
         try:
             with open(filename):
                 pass
