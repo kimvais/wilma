@@ -9,11 +9,14 @@
 from email.mime.text import MIMEText
 from email.utils import formatdate, formataddr
 import logging
+import os
 import smtplib
+import sys
+
 import bs4
 from dateutil.parser import parse
 import requests
-import sys
+
 
 logger = logging.getLogger(__name__)
 
@@ -48,11 +51,13 @@ def fetch(conf, user, send_mail=True):
     for message_link in messages.find_all('a', attrs={'class': 'fitt'}):
         message_id = message_link.attrs['href'].rsplit('/', 1)[-1]
 
+        filename = os.path.join(settings.DATAPATH,
+                                'data/{0}_{1}.txt'.format(user, message_id))
         try:
-            with open('data/{0}_{1}.txt'.format(user, message_id)):
+            with open(filename):
                 pass
         except (OSError, IOError):
-            with open('data/{0}_{1}.txt'.format(user, message_id), 'wb') as f:
+            with open(filename, 'wb') as f:
                 req = session.get(conf.BASEURL +
                                   '/messages/{0}'.format(message_id))
                 logger.info('{0} - {1}'.format(req.url, req.status_code))
@@ -67,7 +72,8 @@ def fetch(conf, user, send_mail=True):
                 else:
                     timestamp = parse(
                         timestamp.replace(' klo ', ' at '))
-                    message_body = '\n\n'.join(x.text for x in msg.find_all('p'))
+                    message_body = '\n\n'.join(
+                        x.text for x in msg.find_all('p'))
                     message = '** {} - {} **\n\n{}'.format(
                         user,
                         timestamp.isoformat(),
@@ -93,6 +99,7 @@ def fetch(conf, user, send_mail=True):
 
 if __name__ == "__main__":
     import settings
+
     logging.basicConfig()
     logger.setLevel(logging.DEBUG)
     for user in settings.USERS.keys():
