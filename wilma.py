@@ -51,7 +51,7 @@ def fetch(conf, user, send_mail=True):
         try:
             with open('data/{0}_{1}.txt'.format(user, message_id)):
                 pass
-        except (FileNotFoundError):
+        except (OSError, IOError):
             with open('data/{0}_{1}.txt'.format(user, message_id), 'wb') as f:
                 req = session.get(conf.BASEURL +
                                   '/messages/{0}'.format(message_id))
