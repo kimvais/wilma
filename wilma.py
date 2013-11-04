@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def send_email(message, rcpt, sender, subject, timestamp, user):
-    msg = MIMEText(message)
+    msg = MIMEText(message, _charset="utf-8")
     msg['Subject'] = '[{}] {}'.format(user, subject)
     msg['From'] = formataddr((sender, 'wilma-mailer@77.fi'))
     msg['To'] = rcpt
