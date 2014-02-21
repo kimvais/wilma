@@ -45,6 +45,7 @@ def fetch(credentials):
 
     # XXX: Fetch messages too
 
+    logger.debug(session.get('https://oma.muksunkirja.fi/perusmuxu/logout/'))
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
