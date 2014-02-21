@@ -6,30 +6,17 @@
 # Licensed under MIT License, see LICENSE for details.
 #
 
-from email.mime.text import MIMEText
-from email.utils import formatdate, formataddr
 import logging
 import os
-import smtplib
 import sys
 
 import bs4
 from dateutil.parser import parse
 import requests
+from mail import send_email
 
 
 logger = logging.getLogger(__name__)
-
-
-def send_email(message, rcpt, sender, subject, timestamp, user):
-    msg = MIMEText(message, _charset="utf-8")
-    msg['Subject'] = '[{}] {}'.format(user, subject)
-    msg['From'] = formataddr((sender, 'wilma-mailer@77.fi'))
-    msg['To'] = rcpt
-    msg['Date'] = formatdate(int(timestamp.strftime('%s')))
-    s = smtplib.SMTP(settings.SMTP)
-    s.send_message(msg)
-    s.quit()
 
 
 def fetch(conf, user, send_mail=True):
