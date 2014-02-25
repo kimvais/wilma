@@ -1,4 +1,4 @@
-USERS = dict(Kidname=dict(username="your.wilma.username", password="wilmapassword"),
+WILMA_USERS = dict(Kidname=dict(username="your.wilma.username", password="wilmapassword"),
              Otherkid=dict(username="other.wilma.login", password="OtherPass123"))
 BASEURL = 'https://wilma.espoo.fi'
 SMTP = 'smtp.welho.com'  # Your ISP's outgoing e-mail server

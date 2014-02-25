@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     logging.basicConfig()
     logger.setLevel(logging.DEBUG)
-    for user in settings.USERS.keys():
+    for user in settings.WILMA_USERS.keys():
         send_mail = len(sys.argv) < 2
         fetch(settings, user, send_mail)
 
