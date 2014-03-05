@@ -81,5 +81,5 @@ def fetch(credentials):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    fetch(settings.MUXU_CREDS)
+    fetch(settings.MUXU_CREDENTIALS)
 
