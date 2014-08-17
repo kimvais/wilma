@@ -37,13 +37,17 @@ def fetch(conf, send_mail=True):
     role_selection_page = bs4.BeautifulSoup(req.text)
     logger.debug(role_selection_page.find('div', attrs={'class': 'sidebar-related'}).find_all('a'))
     pupils = dict((a.text, a.attrs['href']) for a in role_selection_page.find('div', attrs={'class': 'sidebar-related'}).find_all('a') if a.attrs['href'].startswith('/!'))
+    if not pupils:
+        pupil_link = "/" + req.url.split("/")[-2]
+        name = role_selection_page.find('span', attrs={'class': 'inner'}).text
+        pupils = dict({name: pupil_link})
+        print(pupils)
     for name, pupil_link in pupils.items():
         req = session.get('{}{}/messages'.format(baseurl, pupil_link))
         logger.info('{0} - {1}'.format(req.url, req.status_code))
         messages = bs4.BeautifulSoup(req.text)
         for message_link in messages.find_all('a', attrs={'class': 'fitt'}):
             message_id = message_link.attrs['href'].rsplit('/', 1)[-1]
-
             filename = os.path.join(settings.DATAPATH,
                                     '{0}_{1}.txt'.format(name, message_id))
             try:
@@ -79,7 +83,6 @@ def fetch(conf, send_mail=True):
                         f.write(recipient.encode('utf-8') + b'\n')
                         f.write(timestamp.isoformat().encode('utf-8') + b'\n')
                         f.write(message.encode('utf-8') + b'\n')
-
                         # Mail
                         if send_mail:
                             rcpt = conf.RECIPIENT
