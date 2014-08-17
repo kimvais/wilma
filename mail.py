@@ -13,7 +13,9 @@ import settings
 
 def send_email(message, rcpt, sender, subject, timestamp, user):
     msg = MIMEText(message, _charset="utf-8")
+    subject = subject.replace('\xe4', ' ')
     msg['Subject'] = '[{}] {}'.format(user, subject)
+    sender = sender.replace('\xa0', ' ')
     msg['From'] = formataddr((sender, 'wilma-mailer@77.fi'))
     msg['To'] = rcpt
     msg['Date'] = formatdate(int(timestamp.strftime('%s')))
