@@ -96,8 +96,7 @@ def fetch(conf, send_mail=True):
 if __name__ == "__main__":
     import settings
 
-    logging.basicConfig()
-    logger.setLevel(logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(name)s.%(funcName)s:[%(lineno)s]: %(message)s')
     send_mail = len(sys.argv) < 2
     fetch(settings, send_mail)
 
