@@ -35,8 +35,8 @@ def fetch(conf, send_mail=True):
     req = session.post(baseurl + '/login', logindata)
     logger.info('{0} - {1}'.format(req.url, req.status_code))
     role_selection_page = bs4.BeautifulSoup(req.text)
-    logger.debug(role_selection_page.find('div', attrs={'class': 'sidebar-related'}).find_all('a'))
-    pupils = dict((a.text, a.attrs['href']) for a in role_selection_page.find('div', attrs={'class': 'sidebar-related'}).find_all('a') if a.attrs['href'].startswith('/!'))
+    pupils = dict((a.text, a.attrs['href']) for a in role_selection_page.find_all('a') if
+            a.attrs['href'].startswith('/!') and 'class' not in a.attrs)
     if not pupils:
         pupil_link = "/" + req.url.split("/")[-2]
         name = role_selection_page.find('span', attrs={'class': 'inner'}).text
@@ -63,7 +63,7 @@ def fetch(conf, send_mail=True):
                         continue
                     soup = bs4.BeautifulSoup(req.text)
                     msg = soup.find('div', attrs={'class': 'columns-left-inner'})
-                    subject = soup.find('h1', attrs={'class': 'safeflow'}).text
+                    subject = soup.find('h1').text
                     try:
                         sender, recipient, timestamp = (x.text for x in
                                                         msg.find_all('td')[:3])
